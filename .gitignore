@@ -3,3 +3,7 @@
 
 #Docker Files
 /.env
+
+# Exclude project folders
+hotel-rest-api/
+hotel-backend/
