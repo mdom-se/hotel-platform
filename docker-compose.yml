@@ -1,0 +1,54 @@
+version: '3.1'
+
+services:
+
+  database:
+    image: postgres:alpine3.17
+    hostname: database
+    networks:
+      database-tier:
+        aliases:
+          - database.hotel.com
+    environment:
+      POSTGRES_USER: app-user
+      POSTGRES_PASSWORD: $POSTGRES_PWD
+      POSTGRES_DB: hotel-db
+    ports:
+      - '5432:5432'
+    volumes:
+      - ${DATABASE_SCRIPTS}/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+  hotel-backend:
+    image: hotel-backend:latest
+    build:
+      context: hotel-backend
+    depends_on:
+      - database
+    hostname: hotel-backend
+    ports:
+      - '8080:8080'
+    networks:
+      database-tier:
+      backend-service-tier:
+        aliases:
+          - hotel-backend.hotel.com
+
+  hotel-rest-api:
+    image: hotel-rest-api:latest
+    build:
+      context: hotel-rest-api
+    depends_on:
+      - hotel-backend
+    hostname: hotel-backend
+    ports:
+      - '443:8080'
+    networks:
+      backend-service-tier:
+      rest-api-tier:
+        aliases:
+          - hotel-rest-api.hotel.com
+
+networks:
+  database-tier:
+  rest-api-tier:
+  backend-service-tier:
