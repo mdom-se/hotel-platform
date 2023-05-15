@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.4'
 
 services:
 
@@ -15,6 +15,11 @@ services:
       POSTGRES_DB: hotel-db
     ports:
       - '5432:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app-user -d hotel-db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
     volumes:
       - ${DATABASE_SCRIPTS}/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
@@ -23,10 +28,21 @@ services:
     build:
       context: hotel-backend
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     hostname: hotel-backend
+    healthcheck:
+      test: "curl --fail --silent localhost:8081/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
     ports:
-      - '8080:8080'
+      - '8081:8081'
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "database.password": "$POSTGRES_PWD"
+      }'
     networks:
       database-tier:
       backend-service-tier:
@@ -38,8 +54,15 @@ services:
     build:
       context: hotel-rest-api
     depends_on:
-      - hotel-backend
+      hotel-backend:
+        condition: service_healthy
     hostname: hotel-backend
+    healthcheck:
+      test: "curl --fail --silent localhost:8080/hotel-rest/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
     ports:
       - '443:8080'
     networks:
