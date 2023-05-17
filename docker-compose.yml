@@ -58,20 +58,37 @@ services:
         condition: service_healthy
     hostname: hotel-backend
     healthcheck:
-      test: "curl --fail --silent localhost:8080/hotel-rest/actuator/health | grep UP || exit 1"
+      test: "curl --fail --silent localhost:8080/api/actuator/health | grep UP || exit 1"
       interval: 10s
       timeout: 5s
       retries: 6
       start_period: 10s
     ports:
-      - '443:8080'
+      - '8080:8080'
     networks:
       backend-service-tier:
       rest-api-tier:
         aliases:
           - hotel-rest-api.hotel.com
 
+  hotel-frontend:
+    image: hotel-frontend:latest
+    build:
+      context: hotel-frontend
+    depends_on:
+      hotel-rest-api:
+        condition: service_healthy
+    hostname: hotel-frontend
+    ports:
+      - '443:8082'
+    networks:
+      rest-api-tier:
+      frontend-tier:
+        aliases:
+          - hotel-frontend.hotel.com
+
 networks:
   database-tier:
   rest-api-tier:
   backend-service-tier:
+  frontend-tier:
