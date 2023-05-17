@@ -8,12 +8,14 @@ Please download the other repositories in this folder:
 
 * hotel-backend: https://github.com/mdom-se/hotel-backend.git
 * hotel-rest-api: https://github.com/mdom-se/hotel-rest-api.git
+* hotel-frontend: https://github.com/mdom-se/hotel-frontend.git
 
 For example, you should have the following folders/files structure:
 
 hotel-platform/
 - hotel-backend/  
-- hotel-rest-api/  
+- hotel-rest-api/
+- hotel-frontend/
 - docker-compose.yml
 - .env ( *This file is not versioned, and it requires to add manually)
 
