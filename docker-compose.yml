@@ -3,7 +3,10 @@ version: '3.4'
 services:
 
   database:
-    image: postgres:alpine3.17
+    image: custom-postgres:alpine3.17
+    build:
+      context: ./
+      dockerfile: ./database/Dockerfile
     hostname: database
     networks:
       database-tier:
@@ -20,8 +23,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
     volumes:
       - ${DATABASE_SCRIPTS}/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ${CONFIGURATIONS}/postgresql.conf:/etc/postgresql/postgresql.conf
 
   hotel-backend:
     image: hotel-backend:latest
@@ -41,13 +46,17 @@ services:
       - '8081:8081'
     environment:
       SPRING_APPLICATION_JSON: '{
-        "database.password": "$POSTGRES_PWD"
+        "database.password": "$POSTGRES_PWD",
+        "certificates.dir": "/certificates",
+        "certificates-password": "$CERTIFICATES_PWD"
       }'
     networks:
       database-tier:
       backend-service-tier:
         aliases:
           - hotel-backend.hotel.com
+    volumes:
+      - ${CERTIFICATES}/:/certificates
 
   hotel-rest-api:
     image: hotel-rest-api:latest
@@ -64,12 +73,19 @@ services:
       retries: 6
       start_period: 10s
     ports:
-      - '8080:8080'
+      - '8080:8443'
+    environment:
+      JAVA_OPTS:
+        -Djavax.net.ssl.trustStore=/certificates/cacerts
+        -Djavax.net.ssl.trustStorePassword=${CERTIFICATES_PWD}
     networks:
       backend-service-tier:
       rest-api-tier:
         aliases:
           - hotel-rest-api.hotel.com
+    volumes:
+      - ${CERTIFICATES}/:/certificates
+      - ${TOMCAT_CONFIG}/server.xml:/usr/local/tomcat/conf/server.xml
 
   hotel-frontend:
     image: hotel-frontend:latest

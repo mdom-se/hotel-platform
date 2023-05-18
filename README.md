@@ -21,5 +21,9 @@ hotel-platform/
 
 The .env is a [docker-file](https://docs.docker.com/compose/environment-variables/env-file/) that stores docker variables required in the docker-compose definition such as:
 
-POSTGRES_PWD: It's the variable to setup the password our database.  
-DATABASE_SCRIPTS: It's the complete path for our folder "hotel-backend/database/". 
+POSTGRES_PWD= # It's the variable to setup the password our database.  
+DATABASE_SCRIPTS= # It's the complete path for our folder "hotel-backend/database/".  
+CERTIFICATES= # It's the complete path for the folder "/hotel-platform/certificates"  
+CONFIGURATIONS= # It's the complete path for the folder "/hotel-platform/configurations"  
+CERTIFICATES_PWD= # Configure this value "hotel-demo" *without double quotes
+TOMCAT_CONFIG=# It's the complete path for the folder "/hotel-platform/hotel-rest-api/tomcat-config"
