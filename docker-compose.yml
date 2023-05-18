@@ -37,7 +37,7 @@ services:
         condition: service_healthy
     hostname: hotel-backend
     healthcheck:
-      test: "curl --fail --silent localhost:8081/actuator/health | grep UP || exit 1"
+      test: "curl --fail --silent -k https://localhost:8081/actuator/health | grep UP || exit 1"
       interval: 10s
       timeout: 5s
       retries: 6
@@ -65,9 +65,9 @@ services:
     depends_on:
       hotel-backend:
         condition: service_healthy
-    hostname: hotel-backend
+    hostname: hotel-rest-api
     healthcheck:
-      test: "curl --fail --silent localhost:8080/api/actuator/health | grep UP || exit 1"
+      test: "curl --fail --silent -k https://localhost:8443/api/actuator/health | grep UP || exit 1"
       interval: 10s
       timeout: 5s
       retries: 6
