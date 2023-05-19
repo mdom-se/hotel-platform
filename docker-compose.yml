@@ -44,12 +44,14 @@ services:
       start_period: 10s
     ports:
       - '8081:8081'
+      - '5005:5005'
     environment:
       SPRING_APPLICATION_JSON: '{
         "database.password": "$POSTGRES_PWD",
         "certificates.dir": "/certificates",
         "certificates-password": "$CERTIFICATES_PWD"
       }'
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
     networks:
       database-tier:
       backend-service-tier:
@@ -74,7 +76,9 @@ services:
       start_period: 10s
     ports:
       - '8080:8443'
+      - '5006:5005'
     environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
       JAVA_OPTS:
         -Djavax.net.ssl.trustStore=/certificates/cacerts
         -Djavax.net.ssl.trustStorePassword=${CERTIFICATES_PWD}
