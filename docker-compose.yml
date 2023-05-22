@@ -97,11 +97,18 @@ services:
     hostname: hotel-frontend
     ports:
       - '443:8082'
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "certificates.dir": "/certificates",
+        "certificates-password": "$CERTIFICATES_PWD"
+      }'
     networks:
       rest-api-tier:
       frontend-tier:
         aliases:
           - hotel-frontend.hotel.com
+    volumes:
+      - ${CERTIFICATES}/:/certificates
 
 networks:
   database-tier:
